@@ -10,7 +10,7 @@ class Schwab():
 
     def __init__(self):
 
-        self.secretsPath = './secrets.json'
+        self.secretsPath = '../secrets.json'
 
         self.loadSecrets()
 
