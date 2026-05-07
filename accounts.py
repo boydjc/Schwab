@@ -1,3 +1,7 @@
+from auth import Auth
+import requests
+import json
+
 '''
     Handles the accounts and trading endpoints
 '''
@@ -9,13 +13,13 @@ class Accounts():
     def getAccountNumber(self):
     # this function assumes there is only one account numbers
 
-        if self.checkAccessExpire():
-            self.createAccessToken()
+        if self.auth.checkAccessExpire():
+            self.auth.createAccessToken()
 
         accountUrl = "https://api.schwabapi.com/trader/v1/accounts/accountNumbers"
 
         headers = {
-            "Authorization" : "Bearer " + self.accessToken
+            "Authorization" : "Bearer " + self.auth.getAccessToken()
         }
 
         try:
@@ -36,13 +40,13 @@ class Accounts():
     def getAccountInfo(self, accountNumberHash):
 
 
-        if self.checkAccessExpire():
-            self.createAccessToken()
+        if self.auth.checkAccessExpire():
+            self.auth.createAccessToken()
 
         accountUrl = f"https://api.schwabapi.com/trader/v1/accounts/{accountNumberHash}"
 
         headers = {
-            "Authorization" : "Bearer " + self.accessToken
+            "Authorization" : "Bearer " + self.auth.getAccessToken()
         }
 
         try:
