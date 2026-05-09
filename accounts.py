@@ -1,9 +1,6 @@
 from auth import Auth
-<<<<<<< HEAD
-from .dataclasses.accounts.accountNumberHash import AccountNumberHash
+from .dataclasses.accountDataClasses import AccountNumberHash
 
-=======
->>>>>>> main
 import requests
 import json
 
@@ -70,7 +67,3 @@ class Accounts():
 
         except Exception as e:
             print(e)
-<<<<<<< HEAD
-=======
-
->>>>>>> main
