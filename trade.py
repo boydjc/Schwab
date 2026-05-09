@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from datetime import datetime, timezone, timedelta
 from typing import Optional
 import requests
@@ -9,6 +10,12 @@ class Trade():
 
     def __init__(self, auth: Auth):
         self.auth = Auth()
+=======
+class Trade():
+
+    def __init__(self, auth: Auth):
+        pass
+>>>>>>> main
 
     def getAllOrders(self, accountNumberHash, status=None):
 
@@ -25,7 +32,11 @@ class Trade():
             accountUrl += f"&status={status}"
 
         headers = {
+<<<<<<< HEAD
             "Authorization" : "Bearer " + self.auth.getAccessToken()
+=======
+            "Authorization" : "Bearer " + self.accessToken
+>>>>>>> main
         }
     
         try:
@@ -50,7 +61,11 @@ class Trade():
         orderUrl = f"https://api.schwabapi.com/trader/v1/accounts/{accountNumberHash}/orders/{orderId}"
 
         headers = {
+<<<<<<< HEAD
             "Authorization" : "Bearer " + self.auth.getAccessToken()
+=======
+            "Authorization" : "Bearer " + self.accessToken
+>>>>>>> main
         }
 
         try:
@@ -121,7 +136,11 @@ class Trade():
         }
 
         headers = {
+<<<<<<< HEAD
             "Authorization" : "Bearer " + self.auth.getAccessToken()
+=======
+            "Authorization" : "Bearer " + self.accessToken
+>>>>>>> main
         }
     
         try:
