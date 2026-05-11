@@ -1,5 +1,5 @@
 from auth import Auth
-from .dataclasses.accountDataClasses import AccountNumberHash
+from schemas.dataclasses.account import *
 
 import requests
 import json
@@ -12,7 +12,7 @@ class Accounts():
     def __init__(self, auth: Auth):
         self.auth = auth
 
-    def getAccountNumber(self):
+    def getAccountNumber(self) -> AccountNumberHash:
     # this function assumes there is only one account numbers
 
         if self.auth.checkAccessExpire():
@@ -24,14 +24,16 @@ class Accounts():
             "Authorization" : "Bearer " + self.auth.getAccessToken()
         }
 
+        result: AccountNumberHash = None
+
         try:
             res = requests.get(accountUrl, headers=headers)
 
             if res.status_code == 200:
 
-                resJson = json.loads(res.text)
+                result = json.loads(res.text)
 
-                return resJson[0]
+                return AccountNumberHash(**result[0])
             else:
                 print(res)
                 print("Status code: ", res.status_code)
@@ -39,7 +41,7 @@ class Accounts():
         except Exception as e:
             print(e)
 
-    def getAccountInfo(self, accountNumberHash):
+    def getAccountInfo(self, accountNumberHash) -> Account:
 
 
         if self.auth.checkAccessExpire():
@@ -58,9 +60,27 @@ class Accounts():
 
                 resJson = json.loads(res.text)
 
-                print(resJson)
+                if "securitiesAccount" in resJson.keys():
 
-                return resJson
+                    securitiesData = resJson["securitiesAccount"]
+
+                    if securitiesData["type"] == "CASH":
+                        securitiesAccount = SecuritiesAccount(
+                            cashAccount=CashAccount(**securitiesData)
+                        )
+                    else:
+                        securitiesAccount = SecuritiesAccount(
+                            marginAccount=MarginAccount(**securitiesData)
+                        )
+                    
+                    account = Account(
+                        securitiesAccount = securitiesAccount
+                    )
+
+                    return account
+
+                return None
+            
             else:
                 print(res)
                 print("Status code: ", res.status_code)
