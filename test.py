@@ -1,4 +1,5 @@
 from auth import Auth
+from schwab import Schwab
 from market import Market
 from accounts import Accounts
 from trade import Trade
@@ -9,9 +10,12 @@ class Test():
 
     def __init__(self):
         self.auth = Auth()
-        #self.market = Market(self.auth)
-        self.accounts = Accounts(self.auth)
-        #self.trade = Trade(self.auth)
+        self.schwab = Schwab(self.auth)
+
+
+        #self.market = Market(self.schwab)
+        self.accounts = Accounts(self.schwab)
+        #self.trade = Trade(self.schwab)
 
     # Market Tests
 

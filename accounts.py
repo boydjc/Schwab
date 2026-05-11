@@ -1,4 +1,5 @@
 from auth import Auth
+from schwab import Schwab
 from schemas.dataclasses.account import *
 
 import requests
@@ -9,39 +10,48 @@ import json
 '''
 class Accounts():
 
-    def __init__(self, auth: Auth):
-        self.auth = auth
+    def __init__(self, schwab: Schwab):
+        self.schwab = schwab
 
     def getAccountNumber(self) -> AccountNumberHash:
-    # this function assumes there is only one account numbers
-
-        if self.auth.checkAccessExpire():
-            self.auth.createAccessToken()
+        # this function assumes there is only one account
 
         accountUrl = "https://api.schwabapi.com/trader/v1/accounts/accountNumbers"
 
-        headers = {
-            "Authorization" : "Bearer " + self.auth.getAccessToken()
-        }
+        results = self.schwab.sendGetRequest(accountUrl)
 
-        result: AccountNumberHash = None
+        return AccountNumberHash(**results[0])
 
-        try:
-            res = requests.get(accountUrl, headers=headers)
-
-            if res.status_code == 200:
-
-                result = json.loads(res.text)
-
-                return AccountNumberHash(**result[0])
-            else:
-                print(res)
-                print("Status code: ", res.status_code)
-
-        except Exception as e:
-            print(e)
 
     def getAccountInfo(self, accountNumberHash) -> Account:
+
+        accountUrl = f"https://api.schwabapi.com/trader/v1/accounts/{accountNumberHash}"
+
+        results = self.schwab.sendGetRequest(accountUrl)
+
+        if "securitiesAccount" in results.keys():
+
+            securitiesData = results["securitiesAccount"]
+
+            if securitiesData["type"] == "CASH":
+                securitiesAccount = SecuritiesAccount(
+                    cashAccount=CashAccount(**securitiesData)
+                )
+            else:
+                securitiesAccount = SecuritiesAccount(
+                    marginAccount=MarginAccount(**securitiesData)
+                )
+            
+            account = Account(
+                securitiesAccount = securitiesAccount
+            )
+
+            return account
+    
+        return None
+
+
+    def getOrders(self, accountNumberHash: str, maxResults: int, fromEnteredDateTime: str, toEnteredDateTime: str, status: Status):
 
 
         if self.auth.checkAccessExpire():
@@ -52,38 +62,3 @@ class Accounts():
         headers = {
             "Authorization" : "Bearer " + self.auth.getAccessToken()
         }
-
-        try:
-            res = requests.get(accountUrl, headers=headers)
-
-            if res.status_code == 200:
-
-                resJson = json.loads(res.text)
-
-                if "securitiesAccount" in resJson.keys():
-
-                    securitiesData = resJson["securitiesAccount"]
-
-                    if securitiesData["type"] == "CASH":
-                        securitiesAccount = SecuritiesAccount(
-                            cashAccount=CashAccount(**securitiesData)
-                        )
-                    else:
-                        securitiesAccount = SecuritiesAccount(
-                            marginAccount=MarginAccount(**securitiesData)
-                        )
-                    
-                    account = Account(
-                        securitiesAccount = securitiesAccount
-                    )
-
-                    return account
-
-                return None
-            
-            else:
-                print(res)
-                print("Status code: ", res.status_code)
-
-        except Exception as e:
-            print(e)
