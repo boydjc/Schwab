@@ -1,7 +1,14 @@
+from datetime import datetime, timezone, timedelta
+from typing import Optional
+import requests
+import json
+
+from auth import Auth
+
 class Trade():
 
     def __init__(self, auth: Auth):
-        pass
+        self.auth = Auth()
 
     def getAllOrders(self, accountNumberHash, status=None):
 
@@ -18,7 +25,7 @@ class Trade():
             accountUrl += f"&status={status}"
 
         headers = {
-            "Authorization" : "Bearer " + self.accessToken
+            "Authorization" : "Bearer " + self.auth.getAccessToken()
         }
     
         try:
@@ -43,7 +50,7 @@ class Trade():
         orderUrl = f"https://api.schwabapi.com/trader/v1/accounts/{accountNumberHash}/orders/{orderId}"
 
         headers = {
-            "Authorization" : "Bearer " + self.accessToken
+            "Authorization" : "Bearer " + self.auth.getAccessToken()
         }
 
         try:
@@ -114,7 +121,7 @@ class Trade():
         }
 
         headers = {
-            "Authorization" : "Bearer " + self.accessToken
+            "Authorization" : "Bearer " + self.auth.getAccessToken()
         }
     
         try:

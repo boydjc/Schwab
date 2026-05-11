@@ -1,6 +1,7 @@
 from auth import Auth
 from market import Market
 from accounts import Accounts
+from trade import Trade
 
 class Test():
 
@@ -8,6 +9,7 @@ class Test():
         self.auth = Auth()
         self.market = Market(self.auth)
         self.accounts = Accounts(self.auth)
+        self.trade = Trade()
 
     # Market Tests
 
@@ -38,6 +40,8 @@ if __name__ == "__main__":
 
     #test.getQuote()
     #test.getHistorical()
+    #accountNumber = test.getAccountNumber()
+    #test.getAccountInfo()
     #test.getAccountNumber()
     test.getAccountInfo()
     
