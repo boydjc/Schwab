@@ -1,15 +1,21 @@
 from auth import Auth
+from schwab import Schwab
 from market import Market
 from accounts import Accounts
 from trade import Trade
+
+from schemas.dataclasses.account import *
 
 class Test():
 
     def __init__(self):
         self.auth = Auth()
-        self.market = Market(self.auth)
-        self.accounts = Accounts(self.auth)
-        self.trade = Trade()
+        self.schwab = Schwab(self.auth)
+
+
+        #self.market = Market(self.schwab)
+        self.accounts = Accounts(self.schwab)
+        #self.trade = Trade(self.schwab)
 
     # Market Tests
 
@@ -26,10 +32,10 @@ class Test():
 
     def getAccountInfo(self):
         
-        accountNumber = self.accounts.getAccountNumber()
+        accountNumber: AccountNumberHash = self.accounts.getAccountNumber()
 
-        if 'hashValue' in accountNumber.keys():
-            print(self.accounts.getAccountInfo(accountNumber['hashValue']))
+        if accountNumber.hashValue:
+            print(self.accounts.getAccountInfo(accountNumber.hashValue))
         else:
             print("ERROR: No hashValue returned in account number call")
 
@@ -40,8 +46,6 @@ if __name__ == "__main__":
 
     #test.getQuote()
     #test.getHistorical()
-    #accountNumber = test.getAccountNumber()
-    #test.getAccountInfo()
     #test.getAccountNumber()
     test.getAccountInfo()
     

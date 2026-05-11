@@ -1,5 +1,6 @@
 from auth import Auth
-from .dataclasses.accountDataClasses import AccountNumberHash
+from schwab import Schwab
+from schemas.dataclasses.account import *
 
 import requests
 import json
@@ -9,37 +10,48 @@ import json
 '''
 class Accounts():
 
-    def __init__(self, auth: Auth):
-        self.auth = auth
+    def __init__(self, schwab: Schwab):
+        self.schwab = schwab
 
-    def getAccountNumber(self):
-    # this function assumes there is only one account numbers
-
-        if self.auth.checkAccessExpire():
-            self.auth.createAccessToken()
+    def getAccountNumber(self) -> AccountNumberHash:
+        # this function assumes there is only one account
 
         accountUrl = "https://api.schwabapi.com/trader/v1/accounts/accountNumbers"
 
-        headers = {
-            "Authorization" : "Bearer " + self.auth.getAccessToken()
-        }
+        results = self.schwab.sendGetRequest(accountUrl)
 
-        try:
-            res = requests.get(accountUrl, headers=headers)
+        return AccountNumberHash(**results[0])
 
-            if res.status_code == 200:
 
-                resJson = json.loads(res.text)
+    def getAccountInfo(self, accountNumberHash) -> Account:
 
-                return resJson[0]
+        accountUrl = f"https://api.schwabapi.com/trader/v1/accounts/{accountNumberHash}"
+
+        results = self.schwab.sendGetRequest(accountUrl)
+
+        if "securitiesAccount" in results.keys():
+
+            securitiesData = results["securitiesAccount"]
+
+            if securitiesData["type"] == "CASH":
+                securitiesAccount = SecuritiesAccount(
+                    cashAccount=CashAccount(**securitiesData)
+                )
             else:
-                print(res)
-                print("Status code: ", res.status_code)
+                securitiesAccount = SecuritiesAccount(
+                    marginAccount=MarginAccount(**securitiesData)
+                )
+            
+            account = Account(
+                securitiesAccount = securitiesAccount
+            )
 
-        except Exception as e:
-            print(e)
+            return account
+    
+        return None
 
-    def getAccountInfo(self, accountNumberHash):
+
+    def getOrders(self, accountNumberHash: str, maxResults: int, fromEnteredDateTime: str, toEnteredDateTime: str, status: Status):
 
 
         if self.auth.checkAccessExpire():
@@ -50,20 +62,3 @@ class Accounts():
         headers = {
             "Authorization" : "Bearer " + self.auth.getAccessToken()
         }
-
-        try:
-            res = requests.get(accountUrl, headers=headers)
-
-            if res.status_code == 200:
-
-                resJson = json.loads(res.text)
-
-                print(resJson)
-
-                return resJson
-            else:
-                print(res)
-                print("Status code: ", res.status_code)
-
-        except Exception as e:
-            print(e)
