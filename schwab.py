@@ -13,7 +13,7 @@ class Schwab():
         self.auth = auth
 
 
-    def sendGetRequest(self, urlIn, headersIn={}):
+    def sendGetRequest(self, urlIn, headersIn={}, paramsIn={}):
 
         if self.auth.checkAccessExpire():
             self.auth.createAccessToken()
@@ -26,7 +26,7 @@ class Schwab():
 
         try:
 
-            res = requests.get(urlIn, headers=headers)
+            res = requests.get(urlIn, headers=headers, params=paramsIn)
 
             if res.status_code == 200:
 
@@ -36,8 +36,13 @@ class Schwab():
             
             else:
                 print("Failed GET request on endpoint: ", urlIn)
-                print(res)
+                print(res.text)
                 print("Status Code: ", res.status_code)
-
+                print("Headers")
+                for header, value in headers.items():
+                    print(header + " : " + value)
+                print("Parameters")
+                for param, value in paramsIn.items():
+                    print(param + " : " + value)
         except Exception as e:
             print(e)

@@ -2,8 +2,7 @@ from auth import Auth
 from schwab import Schwab
 from schemas.dataclasses.account import *
 
-import requests
-import json
+from datetime import datetime, timezone, timedelta
 
 '''
     Handles the accounts and trading endpoints
@@ -16,18 +15,18 @@ class Accounts():
     def getAccountNumber(self) -> AccountNumberHash:
         # this function assumes there is only one account
 
-        accountUrl = "https://api.schwabapi.com/trader/v1/accounts/accountNumbers"
+        url = "https://api.schwabapi.com/trader/v1/accounts/accountNumbers"
 
-        results = self.schwab.sendGetRequest(accountUrl)
+        results = self.schwab.sendGetRequest(url)
 
         return AccountNumberHash(**results[0])
 
 
     def getAccountInfo(self, accountNumberHash) -> Account:
 
-        accountUrl = f"https://api.schwabapi.com/trader/v1/accounts/{accountNumberHash}"
+        url = f"https://api.schwabapi.com/trader/v1/accounts/{accountNumberHash}"
 
-        results = self.schwab.sendGetRequest(accountUrl)
+        results = self.schwab.sendGetRequest(url)
 
         if "securitiesAccount" in results.keys():
 
@@ -51,14 +50,31 @@ class Accounts():
         return None
 
 
-    def getOrders(self, accountNumberHash: str, maxResults: int, fromEnteredDateTime: str, toEnteredDateTime: str, status: Status):
+    def getOrders(self, accountNumberHash: str, fromEnteredDateTime: str = None, toEnteredDateTime: str = None, maxResults: str = "3000", status: Status = Status.WORKING):
 
 
-        if self.auth.checkAccessExpire():
-            self.auth.createAccessToken()
+        if not fromEnteredDateTime:
 
-        accountUrl = f"https://api.schwabapi.com/trader/v1/accounts/{accountNumberHash}"
+            fromEnteredDateTime = (datetime.now(timezone.utc) - timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
 
-        headers = {
-            "Authorization" : "Bearer " + self.auth.getAccessToken()
+        if not toEnteredDateTime:
+
+            toEnteredDateTime = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+
+
+        url = f"https://api.schwabapi.com/trader/v1/accounts/{accountNumberHash}/orders"
+
+        params = {
+            "accountNumber" : accountNumberHash,
+            "fromEnteredTime" : fromEnteredDateTime,
+            "toEnteredTime" : toEnteredDateTime,
+            "maxResults" : maxResults,
+            "status" : status
         }
+
+        results = self.schwab.sendGetRequest(url, paramsIn=params)
+
+        if len(results) != 0:
+            return Order(**results)
+
+        return None
