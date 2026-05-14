@@ -1,9 +1,29 @@
 from auth import Auth
 from schwab import Schwab
-from schemas.dataclasses.account import *
+from schemas.dataclasses.account import AccountNumberHash, \
+                                        Account, Instrument, \
+                                        OrderLegCollection, \
+                                        SecuritiesAccount, \
+                                        CashAccount, \
+                                        MarginAccount, \
+                                        OrderRequest, \
+                                        AccountsInstrument, \
+                                        AccountEquity, \
+                                        Order
 
-import requests
-import json
+from schemas.enums.account import Duration, \
+                                  Instruction, \
+                                  OrderTypeRequest, \
+                                  RequestedDestination, \
+                                  Session, \
+                                  Status, \
+                                  OrderLegType, \
+                                  AssetType, \
+                                  OrderStrategyType, \
+                                  StopType
+
+from datetime import datetime, timezone, timedelta
+from dataclasses import asdict
 
 '''
     Handles the accounts and trading endpoints
@@ -16,18 +36,18 @@ class Accounts():
     def getAccountNumber(self) -> AccountNumberHash:
         # this function assumes there is only one account
 
-        accountUrl = "https://api.schwabapi.com/trader/v1/accounts/accountNumbers"
+        url = "https://api.schwabapi.com/trader/v1/accounts/accountNumbers"
 
-        results = self.schwab.sendGetRequest(accountUrl)
+        results = self.schwab.sendGetRequest(url)
 
         return AccountNumberHash(**results[0])
 
 
     def getAccountInfo(self, accountNumberHash) -> Account:
 
-        accountUrl = f"https://api.schwabapi.com/trader/v1/accounts/{accountNumberHash}"
+        url = f"https://api.schwabapi.com/trader/v1/accounts/{accountNumberHash}"
 
-        results = self.schwab.sendGetRequest(accountUrl)
+        results = self.schwab.sendGetRequest(url)
 
         if "securitiesAccount" in results.keys():
 
@@ -51,14 +71,130 @@ class Accounts():
         return None
 
 
-    def getOrders(self, accountNumberHash: str, maxResults: int, fromEnteredDateTime: str, toEnteredDateTime: str, status: Status):
+    def getOrders(self, accountNumberHash: str, fromEnteredDateTime: str = None, toEnteredDateTime: str = None, maxResults: str = "3000", status: Status = Status.WORKING):
 
 
-        if self.auth.checkAccessExpire():
-            self.auth.createAccessToken()
+        if not fromEnteredDateTime:
 
-        accountUrl = f"https://api.schwabapi.com/trader/v1/accounts/{accountNumberHash}"
+            fromEnteredDateTime = (datetime.now(timezone.utc) - timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
 
-        headers = {
-            "Authorization" : "Bearer " + self.auth.getAccessToken()
+        if not toEnteredDateTime:
+
+            toEnteredDateTime = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+
+
+        url = f"https://api.schwabapi.com/trader/v1/accounts/{accountNumberHash}/orders"
+
+        params = {
+            "accountNumber" : accountNumberHash,
+            "fromEnteredTime" : fromEnteredDateTime,
+            "toEnteredTime" : toEnteredDateTime,
+            "maxResults" : maxResults,
+            "status" : status
         }
+
+        results = self.schwab.sendGetRequest(url, paramsIn=params)
+
+        if len(results) != 0:
+            return Order(**results)
+
+        return None
+
+    # we'll  assume that we are buying equities and manually build the orderLegCollection and childOrders for target & stoploss
+    def placeOrder(self,
+        instruction: Instruction,
+        symbol: str,
+        quantity: float,
+        price: float,
+        stopPrice: float,
+        targetPrice: float,
+        accountNumber: str,
+        session: Session = Session.NORMAL,
+        duration: Duration = Duration.DAY,
+        orderType: OrderTypeRequest = OrderTypeRequest.LIMIT,
+        destinationLinkName: RequestedDestination = RequestedDestination.AUTO,
+        dryRun: bool = True # default to not actually sending the order to schwab. True for testing and paper trading strategies
+    ):
+        
+
+        # building the main order
+        orderLegCollection = OrderLegCollection(
+            orderLegType=OrderLegType.EQUITY,
+            quantity=quantity,
+            instruction=Instruction.BUY if instruction == Instruction.BUY else Instruction.SELL,
+            instrument=Instrument(
+                assetType=AssetType.EQUITY,
+                symbol=symbol
+            )
+        )
+
+        # building the two child orders that are OCO target price sell and stop loss sell
+
+        childOrders = [
+            OrderRequest(
+                orderStrategyType=OrderStrategyType.OCO,
+                childOrderStrategies= [
+                    OrderRequest( # target price sell
+                        session=session,
+                        duration=Duration.GOOD_TILL_CANCEL,
+                        orderType=orderType,
+                        price=targetPrice,
+                        orderStrategyType=OrderStrategyType.SINGLE,
+                        orderLegCollection=[
+                            OrderLegCollection(
+                                orderLegType=OrderLegType.EQUITY,
+                                quantity=quantity,
+                                instruction=Instruction.SELL if instruction == Instruction.BUY else Instruction.BUY,
+                                instrument=Instrument(
+                                    assetType=AssetType.EQUITY,
+                                    symbol=symbol
+                                )
+                            )
+                        ]
+                    ),
+
+                    OrderRequest( # stop loss sell
+                        session=session,
+                        duration=Duration.GOOD_TILL_CANCEL,
+                        orderType=OrderTypeRequest.STOP,
+                        stopPrice=stopPrice,
+                        stopType=StopType.STANDARD,
+                        orderStrategyType=OrderStrategyType.SINGLE,
+                        orderLegCollection=[
+                            OrderLegCollection(
+                                orderLegType=OrderLegType.EQUITY,
+                                quantity=quantity,
+                                instruction="SELL" if instruction == Instruction.BUY else "BUY",
+                                instrument=Instrument(
+                                    assetType=AssetType.EQUITY,
+                                    symbol=symbol
+                                )
+                            )
+                        ]
+                    )
+                ]
+            )
+
+            
+        ]
+
+        order = OrderRequest(
+            session=session,
+            duration=duration,
+            orderType=orderType,
+            price=price,
+            orderStrategyType=OrderStrategyType.TRIGGER,
+            orderLegCollection=[orderLegCollection],
+            childOrderStrategies=childOrders
+        )
+
+        url = f"https://api.schwabapi.com/trader/v1/accounts/{accountNumber}/orders"
+
+        params = order
+
+        if not dryRun:
+            res = self.schwab.sendPostRequest(url, paramsIn=params)
+            print(res)
+        else:
+            print("Dry Run Flag is True")
+            print(self.schwab.toPayload(params))

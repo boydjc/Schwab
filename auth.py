@@ -10,8 +10,11 @@ class Auth():
 
         self.loadSecrets()
 
-        if self.checkAccessExpire() and not self.checkRefreshExpire():
-            self.createAccessToken()
+        if self.checkAccessExpire():
+            if not self.checkRefreshExpire():
+                self.createAccessToken(True)
+            else:
+                self.createAccessToken()
 
     def loadSecrets(self):
 
@@ -53,17 +56,24 @@ class Auth():
     
     def checkRefreshExpire(self):
 
-        currentUnixTimestamp = int(datetime.now().timestamp()) * 1000
+        currentUnixTimestamp = int(datetime.now().timestamp() * 1000)
 
-        # Calculate 7 days in milliseconds (7 days * 24 hours/day * 60 minutes/hour * 60 seconds/minute * 1000 ms/second)
+        # 7 days in milliseconds
         sevenDaysInMs = 7 * 24 * 60 * 60 * 1000
 
-        refreshExpiredDate = self.refreshTokenCreationDate + sevenDaysInMs
+        # 1 day in milliseconds
+        oneDayInMs = 24 * 60 * 60 * 1000
 
-        if currentUnixTimestamp > refreshExpiredDate:
-            print("Info: Your schwab refresh token will expire in 1 day.")
+        # Absolute expiration time
+        refreshExpirationDate = self.refreshTokenCreationDate + sevenDaysInMs
+
+        # Warn when there is less than one day remaining
+        warningDate = refreshExpirationDate - oneDayInMs
+
+        if currentUnixTimestamp >= warningDate:
+            print("Info: Your Schwab refresh token will expire in less than 1 day.")
             return True
-        
+
         return False
     
     def checkDirtySecrets(self):

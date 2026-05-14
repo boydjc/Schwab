@@ -39,6 +39,31 @@ class Test():
         else:
             print("ERROR: No hashValue returned in account number call")
 
+    def getOrders(self):
+
+        accountNumber: AccountNumberHash = self.accounts.getAccountNumber()
+
+        if accountNumber.hashValue:
+            print(self.accounts.getOrders(accountNumber.hashValue))
+        else:
+            print("ERROR: No hashValue returned in account number call")
+
+    def sendOrder(self):
+
+        accountNumber: AccountNumberHash = self.accounts.getAccountNumber()
+
+        if accountNumber.hashValue:
+            self.accounts.placeOrder(
+                                     Instruction.BUY,
+                                     symbol="HUMA",
+                                     quantity=1.00,
+                                     price=1.00,
+                                     stopPrice=0.90,
+                                     targetPrice=1.10,
+                                     accountNumber=accountNumber.hashValue,
+                                     dryRun=False
+                                    )
+
 
 if __name__ == "__main__":
 
@@ -47,5 +72,8 @@ if __name__ == "__main__":
     #test.getQuote()
     #test.getHistorical()
     #test.getAccountNumber()
-    test.getAccountInfo()
+    #test.getAccountInfo()
+    #test.getOrders()
+    test.sendOrder()
+    
     
