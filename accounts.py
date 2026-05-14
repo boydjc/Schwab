@@ -82,6 +82,9 @@ class Accounts():
 
             toEnteredDateTime = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
 
+        print("From datetime: ", fromEnteredDateTime)
+        print("To datetime: ", toEnteredDateTime)
+
 
         url = f"https://api.schwabapi.com/trader/v1/accounts/{accountNumberHash}/orders"
 
@@ -89,14 +92,13 @@ class Accounts():
             "accountNumber" : accountNumberHash,
             "fromEnteredTime" : fromEnteredDateTime,
             "toEnteredTime" : toEnteredDateTime,
-            "maxResults" : maxResults,
-            "status" : status
+            "maxResults" : maxResults
         }
 
         results = self.schwab.sendGetRequest(url, paramsIn=params)
 
         if len(results) != 0:
-            return Order(**results)
+            return [Order(**order) for order in results]
 
         return None
 
