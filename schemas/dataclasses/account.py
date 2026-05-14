@@ -425,7 +425,7 @@ class PreviewOrder():
 class OrderLegCollection():
     orderLegType: Optional[OrderLegType] = None
     legId: Optional[int] = None
-    instrument: Optional[AccountsInstrument] = None
+    instrument: Optional[Instrument] = None
     instruction: Optional[Instruction] = None
     positionEffect: Optional[PositionEffect] = None
     quantity: Optional[float] = None
@@ -698,3 +698,8 @@ class UserPreference():
 class ServiceError():
     message: Optional[str] = None
     errors: Optional[list[str]] = None
+
+@dataclass
+class Instrument:
+    assetType: Optional[AssetType] = None
+    symbol: Optional[str] = None
