@@ -73,7 +73,7 @@ if __name__ == "__main__":
     #test.getHistorical()
     #test.getAccountNumber()
     #test.getAccountInfo()
-    #test.getOrders()
-    test.sendOrder()
+    #test.sendOrder()
+    test.getOrders()
     
     

@@ -333,6 +333,7 @@ class Order():
     filledQuantity: Optional[float] = None
     remainingQuantity: Optional[float] = None
     requestedDestination: Optional[RequestedDestination] = None
+    destinationLinkName: Optional[str] = None
     releaseTime: Optional[str] = None
     stopPrice: Optional[float] = None
     stopPriceLinkBasis: Optional[StopPriceLinkBasis] = None
