@@ -45,11 +45,14 @@ class Schwab():
                     for param, value in paramsIn.items():
                         print(param + " : " + value)
 
-            elif type == RequestType.POST:
+            elif type == RequestType.POST or type == RequestType.PUT:
 
                 params=self.toPayload(paramsIn)
 
-                res = requests.post(urlIn, headers=headers, json=params)
+                if type == RequestType.POST:
+                    res = requests.post(urlIn, headers=headers, json=params)
+                else:
+                    res = requests.put(urlIn, headers=headers, json=params)
 
                 if res.status_code == 201:
 
@@ -108,6 +111,6 @@ class Schwab():
 class RequestType(str, Enum):
     GET = "GET"
     POST = "POST"
-    UPDATE = "UPDATE"
+    PUT = "PUT"
     DELETE = "DELETE"
 
