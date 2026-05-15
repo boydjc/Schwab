@@ -15,7 +15,7 @@ class Test():
         self.schwab = Schwab(self.auth)
 
 
-        #self.market = Market(self.schwab)
+        self.market = Market(self.schwab)
         self.accounts = Accounts(self.schwab)
         #self.trade = Trade(self.schwab)
 
@@ -25,7 +25,7 @@ class Test():
         print(self.market.getQuote("AAPL"))
 
     def getHistorical(self):
-        print(self.market.getPriceHistory("AAPL"))
+        print(self.market.getPriceHistory("AAPL", "2026-05-10", "2026-05-15"))
 
     # Account Tests
 
@@ -138,8 +138,13 @@ if __name__ == "__main__":
     #test.getAccountInfo()
     #test.sendOrder()
     #test.getOrders()
-    test.deleteOrders()
+    #test.deleteOrders()
     #test.getUserPreferences()
     #test.replaceOrder()
+
+    # market endpoints
+    test.getHistorical()
+
+
 
     
