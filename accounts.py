@@ -69,7 +69,14 @@ class Accounts():
             return account
     
         return None
+    
+    def getUserPreferences(self):
 
+        url = f"https://api.schwabapi.com/trader/v1/userPreference"
+
+        results = self.schwab.sendRequest(RequestType.GET, url)
+
+        return results
 
     def getOrders(self, accountNumberHash: str, fromEnteredDateTime: str = None, toEnteredDateTime: str = None, maxResults: str = "3000", status: Status = Status.WORKING):
 

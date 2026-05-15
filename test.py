@@ -27,6 +27,9 @@ class Test():
 
     # Account Tests
 
+    def getUserPreferences(self):
+        print(self.accounts.getUserPreferences())
+
     def getAccountNumber(self):
         print(self.accounts.getAccountNumber())
 
@@ -82,12 +85,12 @@ if __name__ == "__main__":
 
     test = Test()
 
-    #test.getQuote()
-    #test.getHistorical()
+    # Account endpoints
     #test.getAccountNumber()
     #test.getAccountInfo()
     #test.sendOrder()
-    test.getOrders()
+    #test.getOrders()
     #test.deleteOrders()
+    test.getUserPreferences()
     
     
