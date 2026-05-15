@@ -4,6 +4,8 @@ from market import Market
 from accounts import Accounts
 from trade import Trade
 
+from time import sleep
+
 from schemas.dataclasses.account import *
 
 class Test():
@@ -27,6 +29,9 @@ class Test():
 
     # Account Tests
 
+    def getUserPreferences(self):
+        print(self.accounts.getUserPreferences())
+
     def getAccountNumber(self):
         print(self.accounts.getAccountNumber())
 
@@ -47,7 +52,7 @@ class Test():
             orders: list[Order] = self.accounts.getOrders(accountNumber.hashValue)
 
             for order in orders:
-                print(order)
+                print(order.status)
 
         else:
             print("ERROR: No hashValue returned in account number call")
@@ -75,19 +80,66 @@ class Test():
         orders: list[Order] = self.accounts.getOrders(accountNumber.hashValue)
 
         for order in orders:
-            self.accounts.deleteOrder(accountNumber.hashValue, order.orderId)
+            if order.status == Status.WORKING or order.status == Status.PENDING_ACTIVATION:
+                self.accounts.deleteOrder(accountNumber.hashValue, order.orderId)
+
+    def replaceOrder(self):
+
+        accountNumber: AccountNumberHash = self.accounts.getAccountNumber()
+
+        print("Placing initial order")
+        self.accounts.placeOrder(
+                                Instruction.BUY,
+                                symbol="HUMA",
+                                quantity=1.00,
+                                price=1.00,
+                                stopPrice=0.90,
+                                targetPrice=1.10,
+                                accountNumber=accountNumber.hashValue,
+                                dryRun=False
+                                )
+        
+        sleep(2)
+
+        orders: list[Order] = self.accounts.getOrders(accountNumber.hashValue)
+
+        for order in orders:
+            if order.status == Status.WORKING or order.status == Status.PENDING_ACTIVATION:
+                print("Placing replace order")
+                self.accounts.placeOrder(
+                                Instruction.BUY,
+                                symbol="HUMA",
+                                quantity=3.00,
+                                price=1.25,
+                                stopPrice=1.00,
+                                targetPrice=1.50,
+                                accountNumber=accountNumber.hashValue,
+                                replace=True,
+                                replaceOrderId=order.orderId,
+                                dryRun=False
+                                )
+                
+        # sleep(2)
+
+        # orders: list[Order] = self.accounts.getOrders(accountNumber.hashValue)
+
+        # for order in orders:
+        #     if order.status == Status.WORKING:
+        #         self.accounts.deleteOrder(accountNumber.hashValue, order.orderId)
+        
 
 
 if __name__ == "__main__":
 
     test = Test()
 
-    #test.getQuote()
-    #test.getHistorical()
+    # Account endpoints
     #test.getAccountNumber()
     #test.getAccountInfo()
     #test.sendOrder()
-    test.getOrders()
-    #test.deleteOrders()
-    
+    #test.getOrders()
+    test.deleteOrders()
+    #test.getUserPreferences()
+    #test.replaceOrder()
+
     

@@ -69,7 +69,14 @@ class Accounts():
             return account
     
         return None
+    
+    def getUserPreferences(self):
 
+        url = f"https://api.schwabapi.com/trader/v1/userPreference"
+
+        results = self.schwab.sendRequest(RequestType.GET, url)
+
+        return results
 
     def getOrders(self, accountNumberHash: str, fromEnteredDateTime: str = None, toEnteredDateTime: str = None, maxResults: str = "3000", status: Status = Status.WORKING):
 
@@ -103,6 +110,8 @@ class Accounts():
         return None
 
     # we'll  assume that we are buying equities and manually build the orderLegCollection and childOrders for target & stoploss
+    # NOTE: Schwab will throw an error if you try and replace an order with another order that has child order. 
+    # Replacing orders cannot have child orders
     def placeOrder(self,
         instruction: Instruction,
         symbol: str,
@@ -111,6 +120,8 @@ class Accounts():
         stopPrice: float,
         targetPrice: float,
         accountNumber: str,
+        replace: bool = False,
+        replaceOrderId: int = None,
         session: Session = Session.NORMAL,
         duration: Duration = Duration.DAY,
         orderType: OrderTypeRequest = OrderTypeRequest.LIMIT,
@@ -189,12 +200,19 @@ class Accounts():
             childOrderStrategies=childOrders
         )
 
-        url = f"https://api.schwabapi.com/trader/v1/accounts/{accountNumber}/orders"
+        if not replace:
+            url = f"https://api.schwabapi.com/trader/v1/accounts/{accountNumber}/orders"
+        else:
+            url = f"https://api.schwabapi.com/trader/v1/accounts/{accountNumber}/orders/{replaceOrderId}"
 
         params = order
 
         if not dryRun:
-            res = self.schwab.sendRequest(RequestType.POST, url, paramsIn=params)
+            if not replace:
+                res = self.schwab.sendRequest(RequestType.POST, url, paramsIn=params)
+            else:
+                res = self.schwab.sendRequest(RequestType.PUT, url, paramsIn=params)
+
             print(res)
         else:
             print("Dry Run Flag is True")
