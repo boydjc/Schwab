@@ -14,73 +14,64 @@ class Schwab():
 
         self.auth = auth
 
-
-    def sendGetRequest(self, urlIn, headersIn={}, paramsIn={}):
-
-        if self.auth.checkAccessExpire():
-            self.auth.createAccessToken()
-
-        headers = headersIn
-
-
-        # add auth token to headers
-        headers["Authorization"] = "Bearer " + self.auth.getAccessToken()
-
-        try:
-
-            res = requests.get(urlIn, headers=headers, params=paramsIn)
-
-            if res.status_code == 200:
-
-                resJson = json.loads(res.text)
-
-                return resJson
-            
-            else:
-                print("Failed GET request on endpoint: ", urlIn)
-                print(res.text)
-                print("Status Code: ", res.status_code)
-                print("Headers")
-                for header, value in headers.items():
-                    print(header + " : " + value)
-                print("Parameters")
-                for param, value in paramsIn.items():
-                    print(param + " : " + value)
-        except Exception as e:
-            print(e)
-
-    def sendPostRequest(self, urlIn, headersIn={}, paramsIn={}):
+    def sendRequest(self, type, urlIn, headersIn={}, paramsIn={}):
 
         if self.auth.checkAccessExpire():
             self.auth.createAccessToken()
 
         headers = headersIn
 
-
         # add auth token to headers
         headers["Authorization"] = "Bearer " + self.auth.getAccessToken()
 
-        params=self.toPayload(paramsIn)
-
-
         try:
+            if type == RequestType.GET:
+                res = requests.get(urlIn, headers=headers, params=paramsIn)
 
-            res = requests.post(urlIn, headers=headers, json=params)
+                if res.status_code == 200:
 
-            if res.status_code == 201:
+                    resJson = json.loads(res.text)
 
-                return "Success"
-            
-            else:
-                print("Failed POST request on endpoint: ", urlIn)
-                print(res.text)
-                print("Status Code: ", res.status_code)
-                print("Headers")
-                for header, value in headers.items():
-                    print(header + " : " + value)
-                print("Parameters")
-                for param, value in params.items():
-                    print(param + " : " + value)
+                    return resJson
+                
+                else:
+                    print("Failed GET request on endpoint: ", urlIn)
+                    print(res.text)
+                    print("Status Code: ", res.status_code)
+                    print("Headers")
+                    for header, value in headers.items():
+                        print(header + " : " + value)
+                    print("Parameters")
+                    for param, value in paramsIn.items():
+                        print(param + " : " + value)
+
+            elif type == RequestType.POST:
+
+                params=self.toPayload(paramsIn)
+
+                res = requests.post(urlIn, headers=headers, json=params)
+
+                if res.status_code == 201:
+
+                    return "Success"
+                
+                else:
+                    print("Failed POST request on endpoint: ", urlIn)
+                    print(res.text)
+                    print("Status Code: ", res.status_code)
+                    print("Headers")
+                    for header, value in headers.items():
+                        print(header + " : " + value)
+                    print("Parameters")
+                    for param, value in params.items():
+                        print(param + " : " + value)
+
+            elif type == RequestType.DELETE:
+
+                res = requests.delete(urlIn, headers=headers, params=paramsIn)
+
+                print(res)
+
         except Exception as e:
             print(e)
 
@@ -113,4 +104,10 @@ class Schwab():
             }
 
         return obj
+    
+class RequestType(str, Enum):
+    GET = "GET"
+    POST = "POST"
+    UPDATE = "UPDATE"
+    DELETE = "DELETE"
 

@@ -44,7 +44,11 @@ class Test():
         accountNumber: AccountNumberHash = self.accounts.getAccountNumber()
 
         if accountNumber.hashValue:
-            print(self.accounts.getOrders(accountNumber.hashValue))
+            orders: list[Order] = self.accounts.getOrders(accountNumber.hashValue)
+
+            for order in orders:
+                print(order)
+
         else:
             print("ERROR: No hashValue returned in account number call")
 
@@ -63,6 +67,15 @@ class Test():
                                      accountNumber=accountNumber.hashValue,
                                      dryRun=False
                                     )
+            
+    def deleteOrders(self):
+
+        accountNumber: AccountNumberHash = self.accounts.getAccountNumber()
+
+        orders: list[Order] = self.accounts.getOrders(accountNumber.hashValue)
+
+        for order in orders:
+            self.accounts.deleteOrder(accountNumber.hashValue, order.orderId)
 
 
 if __name__ == "__main__":
@@ -75,5 +88,6 @@ if __name__ == "__main__":
     #test.getAccountInfo()
     #test.sendOrder()
     test.getOrders()
+    #test.deleteOrders()
     
     

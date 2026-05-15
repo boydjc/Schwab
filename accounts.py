@@ -1,5 +1,5 @@
 from auth import Auth
-from schwab import Schwab
+from schwab import Schwab, RequestType
 from schemas.dataclasses.account import AccountNumberHash, \
                                         Account, Instrument, \
                                         OrderLegCollection, \
@@ -38,7 +38,7 @@ class Accounts():
 
         url = "https://api.schwabapi.com/trader/v1/accounts/accountNumbers"
 
-        results = self.schwab.sendGetRequest(url)
+        results = self.schwab.sendRequest(RequestType.GET, url)
 
         return AccountNumberHash(**results[0])
 
@@ -47,7 +47,7 @@ class Accounts():
 
         url = f"https://api.schwabapi.com/trader/v1/accounts/{accountNumberHash}"
 
-        results = self.schwab.sendGetRequest(url)
+        results = self.schwab.sendRequest(RequestType.GET, url)
 
         if "securitiesAccount" in results.keys():
 
@@ -95,7 +95,7 @@ class Accounts():
             "maxResults" : maxResults
         }
 
-        results = self.schwab.sendGetRequest(url, paramsIn=params)
+        results = self.schwab.sendRequest(RequestType.GET, url, paramsIn=params)
 
         if len(results) != 0:
             return [Order(**order) for order in results]
@@ -114,7 +114,6 @@ class Accounts():
         session: Session = Session.NORMAL,
         duration: Duration = Duration.DAY,
         orderType: OrderTypeRequest = OrderTypeRequest.LIMIT,
-        destinationLinkName: RequestedDestination = RequestedDestination.AUTO,
         dryRun: bool = True # default to not actually sending the order to schwab. True for testing and paper trading strategies
     ):
         
@@ -195,8 +194,22 @@ class Accounts():
         params = order
 
         if not dryRun:
-            res = self.schwab.sendPostRequest(url, paramsIn=params)
+            res = self.schwab.sendRequest(RequestType.POST, url, paramsIn=params)
             print(res)
         else:
             print("Dry Run Flag is True")
             print(self.schwab.toPayload(params))
+
+
+    def deleteOrder(self, accountNumber: str, orderId: str):
+
+        url = f"https://api.schwabapi.com/trader/v1/accounts/{accountNumber}/orders/{orderId}"
+
+        params = {
+            "accountNumber" : accountNumber,
+            "orderId" : orderId
+        }
+
+        res = self.schwab.sendRequest(RequestType.DELETE, url, paramsIn=params)
+
+        print(res)
