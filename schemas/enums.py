@@ -210,7 +210,25 @@ class AssetType(str, Enum):
     FIXED_INCOME = "FIXED_INCOME"
     PRODUCT = "PRODUCT"
     CURRENCY = "CURRENCY"
-    COLLECTIVE_INVESTMENT = "COLLECTIVE_INVESTMENT"    
+    COLLECTIVE_INVESTMENT = "COLLECTIVE_INVESTMENT"
+    BOND = "BOND"
+    ETF = "ETF"
+    EXTENDED = "EXTENDED"
+    FUTURE_OPTION = "FUTURE_OPTION"
+    FUNDAMENTAL = "FUNDAMENTAL"
+    INDICATOR = "INDICATOR"
+    UNKNOWN = "UNKNOWN"
+    COE = "COE"
+    PRF = "PRF"
+    ADR = "ADR"
+    GDR = "GDR"
+    CEF = "CEF"
+    ETF = "ETF"
+    ETN = "ETN"
+    UIT = "UIT"
+    WAR = "WAR"
+    RGT = "RGT"
+
 
 class Instruction(str, Enum):
     BUY = "BUY"
@@ -459,4 +477,23 @@ class SubAccount(str, Enum):
     DIV = "DIV"
     INCOME = "INCOME"
     UNKNOWN = "UNKNOWN"
+
+class Direction(str, Enum):
+    UP =  "UP",
+    DOWN = "DOWN"
+
+# option contract settlement type AM or PM
+class SettlementType(str, Enum):
+    A = "A"
+    P = "P"
+
+# M for End of Month Expiration Calendar Cycle
+# Q for Quarterly expirations (last business day of the quarter month)
+# W for Weekly Expiration (Friday Short Term Expirations)
+# S for expires 3rd Friday of the month (regular options)
+class ExpirationType(str, Enum):
+    M = "M"
+    Q = "Q"
+    S = "S"
+    W = "W"
 
