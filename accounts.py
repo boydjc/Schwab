@@ -9,15 +9,15 @@ from schemas.dataclasses.account import AccountNumberHash, \
                                         OrderRequest, \
                                         Order
 
-from schemas.enums.account import Duration, \
-                                  Instruction, \
-                                  OrderTypeRequest, \
-                                  Status, \
-                                  OrderLegType, \
-                                  AssetType, \
-                                  OrderStrategyType, \
-                                  StopType, \
-                                  Session
+from schemas.enums import Duration, \
+                          Instruction, \
+                          OrderTypeRequest, \
+                          Status, \
+                          OrderLegType, \
+                          AssetType, \
+                          OrderStrategyType, \
+                          StopType, \
+                          Session
 
 from datetime import datetime, timezone, timedelta
 from dataclasses import asdict

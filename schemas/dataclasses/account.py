@@ -1,7 +1,7 @@
 from typing import Optional
 from dataclasses import dataclass
 
-from schemas.enums.account import *
+from schemas.enums import *
 
 @dataclass
 class AccountNumberHash():
