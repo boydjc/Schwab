@@ -497,3 +497,94 @@ class ExpirationType(str, Enum):
     S = "S"
     W = "W"
 
+
+class ExchangeName(str, Enum):
+    IND = "IND"
+    ASE = "ASE"
+    NYS = "NYS"
+    NAS = "NAS"
+    NAP = "NAP"
+    PAC = "PAC"
+    OPR = "OPR"
+    BATS = "BATS"
+
+class Strategy(str, Enum):
+    SINGLE = "SINGLE"
+    ANALYTICAL = "ANALYTICAL"
+    COVERED = "COVERED"
+    VERTICAL = "VERTICAL"
+    CALENDAR = "CALENDAR"
+    STRANGLE = "STRANGLE"
+    STRADDLE = "STRADDLE"
+    BUTTERFLY = "BUTTERFLY"
+    CONDOR = "CONDOR"
+    DIAGONAL = "DIAGONAL"
+    COLLAR = "COLLAR"
+    ROLL = "ROLL"
+
+# known as 'Error' in the docs
+class HttpStatus(str, Enum):
+    BAD_REQUEST = "400"
+    UNAUTHORIZED = "401"
+    NOT_FOUND = "404"
+    INTERNAL_SERVER_ERROR = "500"
+
+class QuoteType(str, Enum):
+    NBBO = "NBBO"
+    NFL = "NFL"
+
+class DivFreq(int, Enum):
+    ANNUAL = 1               # Once per year
+    SEMI_ANNUAL = 2          # Twice per year
+    THREE_TIMES_PER_YEAR = 3 # 3x per year
+    QUARTERLY = 4            # 4x per year
+    BIMONTHLY = 6            # Every other month (6x per year)
+    ELEVEN_TIMES_PER_YEAR = 11
+    MONTHLY = 12             # 12x per year
+
+# option contract exercise type America or European
+class ExerciseType(str, Enum):
+    A = "A"
+    E = "E"
+
+class FundStrategy(str, Enum):
+    A = "A"
+    L = "L"
+    P = "P"
+    Q = "Q"
+    S = "S"
+
+class ExpirationType(str, Enum):
+    M = "M" # end of month
+    Q = "Q" # Quarterly
+    S = "S" # regular options
+    W = "W" # friday short term expirations
+
+class SettlementType(str, Enum):
+    A = "A"
+    P = "P"
+
+class ContractType(str, Enum):
+    P = "P" # Put
+    C = "C" # Call
+
+class MutualFundAssetSubType(str, Enum):
+    OEF = "OEF"
+    CEF = "CEF"
+    MMF = "MMF"
+
+class EquityAssetSubType(str, Enum):
+    COE = "COE"
+    PRF = "PRF"
+    ADR = "ADR"
+    GDR = "GDR"
+    CEF = "CEF"
+    ETF = "ETF"
+    ETN = "ETN"
+    UIT = "UIT"
+    WAR = "WAR"
+    RGT = "RGT"
+
+
+
+
