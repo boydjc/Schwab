@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, TypeAlias
 from dataclasses import dataclass, field
 
 from schemas.enums import *
@@ -147,7 +147,17 @@ class CandleList():
 
 @dataclass
 class EquityResponse():
-    assetMainType: 
+    assetMainType: Optional[AssetType]
+    assetSubType: Optional[EquityAssetSubType]
+    ssid: Optional[int]
+    symbol: Optional[str]
+    realtime: Optional[bool]
+    quoteType: Optional[QuoteType]
+    extended: Optional[ExtendedMarket]
+    fundamental: Optional[Fundamental]
+    quote: Optional[QuoteEquity]
+    reference: Optional[ReferenceEquity]
+    regular: Optional[RegularMarket]
 
 @dataclass
 class Expiration():
@@ -222,4 +232,448 @@ class OptionContract():
     intrinsicValue: Optional[float]
     optionRoot: Optional[str]
 
+@dataclass
+class Underlying():
+    ask: Optional[float]
+    askSize: Optional[int]
+    bid: Optional[float]
+    bidSize: Optional[int]
+    change: Optional[float]
+    close: Optional[float]
+    delayed: Optional[bool]
+    description: Optional[str]
+    exchangeName: Optional[ExchangeName]
+    fiftyTwoWeekHigh: Optional[float]
+    fiftyTwoWeekLow: Optional[float]
+    highPrice: Optional[float]
+    last: Optional[float]
+    lowPrice: Optional[float]
+    mark: Optional[float]
+    markChange: Optional[float]
+    markPercentChange: Optional[float]
+    openPrice: Optional[float]
+    percentChange: Optional[float]
+    quoteTime: Optional[int]
+    symbol: Optional[str]
+    totalVolume: Optional[int]
+    tradeTime: Optional[int]
+
+@dataclass
+class OptionContractMap():
+    sessionHours: dict[str, list[Interval]] = field(default_factory=dict)
+
+type OptionContractMap = dict[str, OptionContract]
+
+@dataclass
+class OptionChain():
+    symbol: Optional[str]
+    status: Optional[str]
+    underlying: Optional[Underlying]
+    strategy: Optional[Strategy]
+    interval: Optional[float]
+    isDelayed: Optional[bool]
+    isIndex: Optional[bool]
+    daysToExpiration: Optional[float]
+    interestRate: Optional[float]
+    underlyingPrice: Optional[float]
+    volatility: Optional[float]
+    callExpDateMap: dict[str, list[OptionContractMap]] = field(default_factory=dict)
+    putExpDateMap: dict[str, list[OptionContractMap]] = field(default_factory=dict)
+
+@dataclass
+class ErrorSource():
+    pointer: Optional[list[str]]
+    parameter: Optional[str]
+    header: Optional[str]
+
+@dataclass
+class Error():
+    id: Optional[str]
+    status: Optional[HttpStatus]
+    title: Optional[str]
+    detail: Optional[str]
+    source: Optional[ErrorSource]
+
+@dataclass
+class ErrorResponse():
+    errors: Optional[list[Error]]
+
+@dataclass
+class RegularMarket():
+    regularMarketLastPrice: Optional[float]
+    regularMarketLastSize: Optional[int]
+    regularMarketNetChange: Optional[float]
+    regularMarketPercentChange: Optional[float]
+    regularMarketTradeTime: Optional[int]
+
+@dataclass
+class ReferenceOption():
+    contractType: Optional[ContractType]
+    cusip: Optional[str]
+    daysToExpiration: Optional[int]
+    deliverables: Optional[str]
+    description: Optional[str]
+    exchange: Optional[str]
+    exchangeName: Optional[str]
+    exerciseType: Optional[ExerciseType]
+    expirationDay: Optional[int]
+    expirationMonth: Optional[int]
+    expirationType: Optional[ExpirationType]
+    expirationYear: Optional[int]
+    isPennyPilot: Optional[bool]
+    lastTradingDay: Optional[int]
+    multipler: Optional[float]
+    settlementType: Optional[SettlementType]
+    strikePrice: Optional[float]
+    underlying: Optional[str]
+
+@dataclass
+class ReferenceMutualFund():
+    cusip: Optional[str]
+    description: Optional[str]
+    exchange: Optional[str]
+    exchangeName: Optional[str]
+
+@dataclass
+class ReferenceIndex():
+    description: Optional[str]
+    exchange: Optional[str]
+    exchangeName: Optional[str]
+
+@dataclass
+class ReferenceFutureOption():
+    contractType: Optional[ContractType]
+    description: Optional[str]
+    exchange: Optional[str]
+    exchangeName: Optional[str]
+    multiplier: Optional[float]
+    expirationDate: Optional[int]
+    expirationStyle: Optional[str]
+    strikePrice: Optional[float]
+    underlying: Optional[str]
+
+@dataclass
+class ReferenceFuture():
+    description: Optional[str]
+    exchange: Optional[str]
+    exchangeName: Optional[str]
+    futureActiveSymbol: Optional[str]
+    futureExpirationDate: Optional[int]
+    futureIsActive: Optional[bool]
+    futureMultipler: Optional[bool]
+    futurePriceFormat: Optional[str]
+    futureSettlementPrice: Optional[float]
+    futureTradingHours: Optional[str]
+    product: Optional[str]
+
+@dataclass
+class ReferenceForex():
+    description: Optional[str]
+    exchange: Optional[str]
+    exchangeName: Optional[str]
+    isTradable: Optional[str]
     
+@dataclass
+class ReferenceEquity():
+    cusip: Optional[str]
+    description: Optional[str]
+    exchange: Optional[str]
+    exchangeName: Optional[str]
+    fsiDesc: Optional[str]
+    htbRate: Optional[str]
+    isHardToBorrow: Optional[str]
+    isShortable: Optional[str]
+    otcMarketTier: Optional[str]
+
+@dataclass
+class QuoteResponseObject():
+    equityResponse: Optional[EquityResponse]
+    optionResponse: Optional[OptionResponse]
+    forexResponse: Optional[ForexResponse]
+    futureResponse: Optional[FutureResponse]
+    futureOptionResponse: Optional[FutureOptionResponse]
+    indexResponse: Optional[IndexResponse]
+    mutualFundResponse: Optional[MutualFundResponse]
+    quoteError: Optional[QuoteError]
+
+type QuoteResponse = dict[str, QuoteResponseObject]
+
+@dataclass
+class QuoteRequest():
+    cusips: Optional[list[str]]
+    fields: Optional[str]
+    ssids: Optional[list[int]]
+    symbols: Optional[list[str]]
+    realtime: Optional[bool]
+    indicative: Optional[bool]
+
+@dataclass
+class QuoteOption():
+    fiftyTwoWeekHigh: Optional[float]
+    fiftyTwoWeekLow: Optional[float]
+    askPrice: Optional[float]
+    askSize: Optional[int]
+    bidPrice: Optional[float]
+    bidSize: Optional[int]
+    closePrice: Optional[float]
+    delta: Optional[float]
+    gamma: Optional[float]
+    highPrice: Optional[float]
+    indAskPrice: Optional[float]
+    indBidPrice: Optional[float]
+    indQuoteTime: Optional[float]
+    impliedYield: Optional[float]
+    lastPrice: Optional[float]
+    lastSize: Optional[int]
+    lowPrice: Optional[float]
+    mark: Optional[float]
+    markChange: Optional[float]
+    markPercentChange: Optional[float]
+    moneyIntrinsicValue: Optional[float]
+    netChange: Optional[float]
+    netPercentChange: Optional[float]
+    openInterest: Optional[float]
+    openPrice: Optional[float]
+    quoteTime: Optional[int]
+    rho: Optional[float]
+    securityStatus: Optional[str]
+    theoreticalOptionValue: Optional[str]
+    theta: Optional[float]
+    timeValue: Optional[float]
+    totalVolume: Optional[int]
+    tradeTime: Optional[int]
+    underlyingPrice: Optional[float]
+    vega: Optional[float]
+    volatility: Optional[float]
+
+@dataclass
+class QuoteMutualFund():
+    fiftyTwoWeekHigh: Optional[float]
+    fiftyTwoWeekLow: Optional[float]
+    closePrice: Optional[float]
+    nAV: Optional[float]
+    netChange: Optional[float]
+    netPercentChange: Optional[float]
+    securityStatus: Optional[str]
+    totalVolume: Optional[int]
+    tradeTime: Optional[int]
+
+@dataclass
+class QuoteIndex():
+    fiftyTwoWeekHigh: Optional[float]
+    fiftyTwoWeekLow: Optional[float]
+    closePrice: Optional[float]
+    highPrice: Optional[float]
+    lastPrice: Optional[float]
+    lowPrice: Optional[float]
+    netChange: Optional[float]
+    netPercentChange: Optional[float]
+    openPrice: Optional[float]
+    securityStatus: Optional[str]
+    totalVolume: Optional[int]
+    tradeTime: Optional[int]
+
+@dataclass
+class QuoteFutureOption():
+    askMICId: Optional[str]
+    askPrice: Optional[float]
+    askSize: Optional[int]
+    bidMICId: Optional[str]
+    bidPrice: Optional[float]
+    bidSize: Optional[int]
+    closePrice: Optional[float]
+    highPrice: Optional[float]
+    lastMICId: Optional[str]
+    lastPrice: Optional[float]
+    lastSize: Optional[int]
+    lowPrice: Optional[float]
+    mark: Optional[float]
+    markChange: Optional[float]
+    netChange: Optional[float]
+    netPercentChange: Optional[float]
+    openInterest: Optional[int]
+    openPrice: Optional[float]
+    quoteTime: Optional[int]
+    securityStatus: Optional[str]
+    settlemetPrice: Optional[float]
+    tick: Optional[float]
+    tickAmount: Optional[float]
+    totalVolume: Optional[int]
+    tradeTime: Optional[int]
+
+@dataclass
+class QuoteFuture():
+    askMICId: Optional[str]
+    askPrice: Optional[float]
+    askSize: Optional[int]
+    askTime: Optional[int]
+    bidMICId: Optional[str]
+    bidPrice: Optional[float]
+    bidSize: Optional[int]
+    bidTime: Optional[int]
+    closePrice: Optional[float]
+    futurePercentChange: Optional[float]
+    highPrice: Optional[float]
+    lastMICId: Optional[str]
+    lastPrice: Optional[float]
+    lastSize: Optional[int]
+    lowPrice: Optional[float]
+    mark: Optional[float]
+    netChange: Optional[float]
+    openInterest: Optional[int]
+    openPrice: Optional[float]
+    quoteTime: Optional[int]
+    quotedInSession: Optional[int]
+    securityStatus: Optional[str]
+    settleTime: Optional[int]
+    tick: Optional[float]
+    tickAmount: Optional[float]
+    totalVolume: Optional[int]
+    tradeTime: Optional[int]
+
+@dataclass
+class QuoteForex():
+    fiftyTwoWeekHigh: Optional[float]
+    fiftyTwoWeekLow: Optional[float]
+    askPrice: Optional[float]
+    askSize: Optional[int]
+    bidPrice: Optional[float]
+    bidSize: Optional[int]
+    closePrice: Optional[float]
+    highPrice: Optional[float]
+    lastPrice: Optional[float]
+    lastSize: Optional[int]
+    lowPrice: Optional[float]
+    mark: Optional[float]
+    netChange: Optional[float]
+    netChangePercent: Optional[float]
+    openPrice: Optional[float]
+    quoteTime: Optional[int]
+    securityStatus: Optional[str]
+    tick: Optional[float]
+    tickAmount: Optional[float]
+    totalVolume: Optional[int]
+    tradeTime: Optional[int]
+
+@dataclass
+class QuoteEquity():
+    fiftyTwoWeekHigh: Optional[float]
+    fiftyTwoWeekLow: Optional[float]
+    askMICId: Optional[str]
+    askPrice: Optional[float]
+    askSize: Optional[int]
+    askTime: Optional[int]
+    bidMICId: Optional[str]
+    bidPrice: Optional[float]
+    bidSize: Optional[int]
+    bidTime: Optional[int]
+    closePrice: Optional[float]
+    highPrice: Optional[float]
+    lastMICId: Optional[str]
+    lastPrice: Optional[float]
+    lastSize: Optional[int]
+    lowPrice: Optional[float]
+    mark: Optional[float]
+    markChange: Optional[float]
+    markPercentChange: Optional[float]
+    netChange: Optional[float]
+    netPercentChange: Optional[float]
+    openPrice: Optional[float]
+    quoteTime: Optional[int]
+    securityStatus: Optional[str]
+    totalVolume: Optional[int]
+    tradeTime: Optional[int]
+    volatility: Optional[float]
+
+@dataclass
+class OptionResponse():
+    assetMainType: Optional[AssetType]
+    ssid: Optional[int]
+    symbol: Optional[str]
+    realtime: Optional[bool]
+    quote: Optional[QuoteOption]
+    reference: Optional[ReferenceOption]
+
+@dataclass
+class MutualFundResponse():
+    assetMainType: Optional[AssetType]
+    assetSubType: Optional[MutualFundAssetSubType]
+    ssid: Optional[int]
+    symbol: Optional[str]
+    realtime: Optional[bool]
+    fundamental: Optional[Fundamental]
+    quote: Optional[QuoteMutualFund]
+    reference: Optional[ReferenceMutualFund]
+
+@dataclass
+class IndexResponse():
+    assetMainType: Optional[AssetType]
+    ssid: Optional[int]
+    symbol: Optional[str]
+    realtime: Optional[bool]
+    quote: Optional[QuoteIndex]
+    reference: Optional[ReferenceIndex]
+
+@dataclass
+class FutureResponse():
+    assetMainType: Optional[AssetType]
+    ssid: Optional[int]
+    symbol: Optional[str]
+    realtime: Optional[bool]
+    quote: Optional[QuoteFuture]
+    reference: Optional[ReferenceFuture]
+
+@dataclass
+class FutureOptionResponse():
+    assetMainType: Optional[AssetType]
+    ssid: Optional[int]
+    symbol: Optional[str]
+    realtime: Optional[bool]
+    quote: Optional[QuoteFutureOption]
+    reference: Optional[ReferenceFutureOption]
+
+@dataclass
+class Fundamental():
+    ave10DaysVolume: Optional[float]
+    ave1YearVolume: Optional[float]
+    declarationDate: Optional[str]
+    divAmount: Optional[float]
+    divExDate: Optional[str]
+    divFreq: Optional[int]
+    divPayAmount: Optional[float]
+    divPayDate: Optional[str]
+    divYield: Optional[float]
+    eps: Optional[float]
+    fundLeverageFactor: Optional[float]
+    fundStrategy: Optional[FundStrategy]
+    nextDivExDate: Optional[str]
+    nextDivPayDate: Optional[str]
+    peRatio: Optional[float]
+
+@dataclass
+class ForexResponse():
+    assetMainType: Optional[AssetType]
+    ssid: Optional[int]
+    symbol: Optional[str]
+    realtime: Optional[bool]
+    quote: Optional[QuoteForex]
+    reference: Optional[ReferenceForex]
+
+@dataclass
+class ExtendedMarket():
+    askPrice: Optional[float]
+    askSize: Optional[int]
+    bidPrice: Optional[float]
+    bidSize: Optional[int]
+    lastPrice: Optional[float]
+    lastSize: Optional[int]
+    mark: Optional[float]
+    quoteTime: Optional[int]
+    totalVolume: Optional[int]
+    tradeTime: Optional[int]
+
+@dataclass
+class QuoteError():
+    invalidCusips: Optional[list[str]]
+    invalidSSIDs: Optional[list[int]]
+    invalidSymbols: Optional[list[str]]
