@@ -3,6 +3,7 @@ import requests
 import json
 import pandas as pd
 from schwab import Schwab, RequestType
+from schemas.enums import *
 
 '''
     This class handles all of the market data endpoints
@@ -12,7 +13,63 @@ class Market():
     def __init__(self, schwab: Schwab):
         self.schwab = schwab
 
-    def getPriceHistory(self, ticker: str, startDate: str = None, endDate: str = None):
+    def getQuotes(self, 
+                symbols: str, 
+                fields: str = None,
+                indicative: bool = False):
+
+        if fields:
+            subsetString = "&fields=" + ",".join(fields)
+        else:
+            subsetString = ""
+
+        reqUrl = f"https://api.schwabapi.com/marketdata/v1/quotes?symbols={symbols}{subsetString}"
+
+        if indicative:
+            reqUrl = reqUrl + "&indicative=true"
+        else:
+            reqUrl = reqUrl + "&indicative=false"
+
+        res = self.schwab.sendRequest(RequestType.GET, reqUrl)
+
+        return res
+    
+    def getQuote(self,
+                 symbol_id: str,
+                 fields: str = None):
+        
+        if fields:
+            subsetString = "?fields=" + ",".join(fields)
+        else:
+            subsetString = ""
+
+        reqUrl = f"https://api.schwabapi.com/marketdata/v1/{symbol_id}/quotes{subsetString}"
+
+        res = self.schwab.sendRequest(RequestType.GET, reqUrl)
+
+        return res
+
+
+
+    """
+
+        if the periodType is
+        • day - valid values are 1, 2, 3, 4, 5, 10
+        • month - valid values are 1, 2, 3, 6
+        • year - valid values are 1, 2, 3, 5, 10, 15, 20
+        • ytd - valid values are 1
+
+        If the period is not specified and the periodType is
+        • day - default period is 10.
+        • month - default period is 1.
+        • year - default period is 1.
+        • ytd - default period is 1.
+    """
+    def getPriceHistory(self, 
+                        ticker: str, 
+                        periodType: PeriodType, # day, month, year, ytd
+                        period: int,
+                        str, startDate: str = None, endDate: str = None):
 
         # the date passed here to the url has to be in unix milliseconds
 
@@ -35,66 +92,23 @@ class Market():
         res = self.schwab.sendRequest(RequestType.GET, reqUrl)
 
         return res
-
-    def getQuote(self, 
-                 ticker, 
-                 includeQuote=False, 
-                 includeFundamental=False,
-                 includeExtended=False,
-                 includeReference=False,
-                 includeRegular=False):
-
-        '''
-            Request for subset of data by passing coma separated list of root nodes, 
-            possible root nodes are quote, fundamental, extended, reference, regular. Sending quote, 
-            fundamental in request will return quote and fundamental data in response. 
-            Dont send this attribute for full response.
-        '''
-
-        if self.auth.checkAccessExpire():
-            self.auth.createAccessToken()
-
-        fields = []
-
-        if includeQuote:
-            fields.append("quote")
-            
-        if includeFundamental:
-            fields.append("fundamental")
-            
-        if includeExtended:
-            fields.append("extended")
-            
-        if includeReference:
-            fields.append("reference")
-            
-        if includeRegular:
-            fields.append("regular")
-
-        subsetString = ""
-        if fields:
-            subsetString = "?fields=" + ",".join(fields)
-
-
-        reqUrl = f"https://api.schwabapi.com/marketdata/v1/{ticker}/quotes{subsetString}"
-
-        headers = {
-            "accept": "application/json",
-            "Authorization" : "Bearer " + self.auth.getAccessToken()
-        }
-
-        try:
-            res = requests.get(reqUrl, headers=headers)
-
-            if res.status_code == 200:
-
-                resJson = json.loads(res.text)
-
-                return resJson
-            else:
-                print("Status code: ", res.status_code)
-
-        except Exception as e:
-            print(e)
-
         
+
+    # def getOptionChain(self,
+    #                    symbol: str,
+    #                    contractType: ContractType,
+    #                    strikeCount: int,
+    #                    includeUnderlyingQuote: bool,
+    #                    strategy: Strategy,
+    #                    interval: float,
+    #                    strike: float,
+    #                    range: Range,
+    #                    fromDate: str,
+    #                    toDate: str,
+    #                    volatility: float,
+    #                    underlyingPrice: float,
+    #                    interestRate: float,
+    #                    daysToExpiration: int,
+    #                    expMonth: str,
+    #                    optionType: str,
+    #                    entitlement: str)

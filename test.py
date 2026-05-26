@@ -21,6 +21,9 @@ class Test():
 
     # Market Tests
 
+    def getQuotes(self):
+        print(self.market.getQuotes("AAPL,MSFT,TSLA"))
+
     def getQuote(self):
         print(self.market.getQuote("AAPL"))
 
@@ -143,7 +146,9 @@ if __name__ == "__main__":
     #test.replaceOrder()
 
     # market endpoints
-    test.getHistorical()
+    #test.getHistorical()
+    #test.getQuotes()
+    test.getQuote()
 
 
 
