@@ -72,6 +72,8 @@ class Auth():
 
         if currentUnixTimestamp >= warningDate:
             print("Info: Your Schwab refresh token will expire in less than 1 day.")
+
+        if currentUnixTimestamp < refreshExpirationDate:
             return True
 
         return False
@@ -87,6 +89,9 @@ class Auth():
             self.loadSecrets()
 
     def createAccessToken(self, generateRefreshToken=False):
+
+        print("Creating Access Token")
+        print("Generate Refresh token: ", generateRefreshToken)
 
         # NOTE TO SELF: The auth code that you get to first get a refresh token expires very quickly. 
         # eg. 30 seconds or less 

@@ -223,7 +223,6 @@ class AssetType(str, Enum):
     ADR = "ADR"
     GDR = "GDR"
     CEF = "CEF"
-    ETF = "ETF"
     ETN = "ETN"
     UIT = "UIT"
     WAR = "WAR"
@@ -567,6 +566,9 @@ class SettlementType(str, Enum):
 class ContractType(str, Enum):
     P = "P" # Put
     C = "C" # Call
+    PUT = "PUT"
+    CALL = "CALL"
+    ALL = "ALL"
 
 class MutualFundAssetSubType(str, Enum):
     OEF = "OEF"
@@ -584,6 +586,38 @@ class EquityAssetSubType(str, Enum):
     UIT = "UIT"
     WAR = "WAR"
     RGT = "RGT"
+
+class PeriodType(str, Enum):
+    DAY = "DAY"
+    MONTH = "MONTH"
+    YEAR = "YEAR"
+    YTD = "YTD"
+
+class Range(str, Enum):
+    ITM = "ITM"
+    NTM = "NTM"
+    OTM = "OTM"
+
+class ExpMonth(str, Enum):
+    JAN = "JAN"
+    FEB = "FEB"
+    MAR = "MAR"
+    APR = "APR"
+    MAY = "MAY"
+    JUN = "JUN"
+    JUL = "JUL"
+    AUG = "AUG"
+    SEP = "SEP"
+    OCT = "OCT"
+    NOV = "NOV"
+    DEC = "DEC"
+    ALL = "ALL"
+
+class Entitlement(str, Enum):
+    PN = "PN" # Non paying pro
+    NP = "NP" # Nonpro
+    PP = "PP" # paying pro
+
 
 
 
