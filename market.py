@@ -2,7 +2,7 @@ from datetime import datetime
 import requests
 import json
 import pandas as pd
-from schemas.dataclasses.market import CandleList, OptionChain, QuoteResponse
+from schemas.dataclasses.market import CandleList, ExpirationChain, OptionChain, QuoteResponse
 from schwab import Schwab, RequestType
 from schemas.enums import *
 
@@ -147,6 +147,14 @@ class Market():
         if optionType:
             reqUrl += f"&optionType={optionType}"
         
+        res = self.schwab.sendRequest(RequestType.GET, reqUrl)
+
+        return res
+    
+    def getExpirationChain(self, symbol: str) -> ExpirationChain:
+
+        reqUrl = f"https://api.schwabapi.com/marketdata/v1/expirationchain?symbol={symbol}"
+
         res = self.schwab.sendRequest(RequestType.GET, reqUrl)
 
         return res
