@@ -33,6 +33,9 @@ class Test():
     def getOptionChain(self):
         print(self.market.getOptionChain("AAPL"))
 
+    def getExpirationChain(self):
+        print(self.market.getExpirationChain("AAPL"))
+
     # Account Tests
 
     def getUserPreferences(self):
@@ -152,7 +155,8 @@ if __name__ == "__main__":
     #test.getHistorical()
     #test.getQuotes()
     #test.getQuote()
-    test.getOptionChain()
+    #test.getOptionChain()
+    test.getExpirationChain()
 
 
 
