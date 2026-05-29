@@ -30,6 +30,9 @@ class Test():
     def getHistorical(self):
         print(self.market.getPriceHistory("AAPL", "2026-05-10", "2026-05-15"))
 
+    def getOptionChain(self):
+        print(self.market.getOptionChain("AAPL"))
+
     # Account Tests
 
     def getUserPreferences(self):
@@ -148,7 +151,8 @@ if __name__ == "__main__":
     # market endpoints
     #test.getHistorical()
     #test.getQuotes()
-    test.getQuote()
+    #test.getQuote()
+    test.getOptionChain()
 
 
 

@@ -2,6 +2,7 @@ from datetime import datetime
 import requests
 import json
 import pandas as pd
+from schemas.dataclasses.market import CandleList, OptionChain, QuoteResponse
 from schwab import Schwab, RequestType
 from schemas.enums import *
 
@@ -16,7 +17,7 @@ class Market():
     def getQuotes(self, 
                 symbols: str, 
                 fields: str = None,
-                indicative: bool = False):
+                indicative: bool = False) -> QuoteResponse:
 
         if fields:
             subsetString = "&fields=" + ",".join(fields)
@@ -36,7 +37,7 @@ class Market():
     
     def getQuote(self,
                  symbol_id: str,
-                 fields: str = None):
+                 fields: str = None) -> QuoteResponse:
         
         if fields:
             subsetString = "?fields=" + ",".join(fields)
@@ -48,28 +49,119 @@ class Market():
         res = self.schwab.sendRequest(RequestType.GET, reqUrl)
 
         return res
-
-
-
+    
     """
+    Params:
+        symbol: str - ticker symbol
 
-        if the periodType is
-        • day - valid values are 1, 2, 3, 4, 5, 10
-        • month - valid values are 1, 2, 3, 6
-        • year - valid values are 1, 2, 3, 5, 10, 15, 20
-        • ytd - valid values are 1
+        contractType: ContractType
 
-        If the period is not specified and the periodType is
-        • day - default period is 10.
-        • month - default period is 1.
-        • year - default period is 1.
-        • ytd - default period is 1.
+        strikeCount: int - The number of strikes to return above or below the at-the-money price
+
+        includeUnderlyingQuote: boolean - Underying quotes to be included
+
+        strategy: Strategy - OptionChain strategy. Default is SINGLE. ANALYTICAL allows the use of
+            volatility, underlyingPrice, interestRate, and daysToExpiration params to calculate theoretical values
+            Avaiable values: SINGLE, ANALYTICAL, CONVERED, VERTICAL, CALENDAR, STRANGLE, STRADDLE, BUTTERFLY,
+            CONDOR, DIAGONAL, COLLAR, ROLL
+
+        interval: int - Strike interval for spread strategy chains (see strategy param)
+
+        strike: float - Strike Price
+
+        range: Range - Range(ITM/NTM/OTM etc.)
+
+        fromDate: str - From date(pattern: yyyy-MM-dd)
+
+        toDate: str - To date(pattern: yyyy-MM-dd)
+
+        volatility: float - Volatility to use in calculations. Applies only to ANALYTICAL strategy chains
+
+        underlyingPrice: float - Underlying price to use in calculations. Applies only to ANALYTICAL strategy chains
+
+        interestRate: float - Interest rate to use in calculations. Appliees only to ANALYTICAL strategy chains
+
+        daysToExpirations: int - Days to expiration to use in calculations. Applies only to ANALYTICAL chains
+
+        expMonth: str - Expiration month Avaiable values: JAN, FEB, MAR, APR, MAY, JUN, JUL, AUG, SEP, OCT
+            NOV, DEC, ALL
+
+        optionType: str - Option Type
+
+        entitlement: str - Applicable only if its retail token, entitlement of client 
+            PP - PayingPro, NP - NonPro and PN - NonPayingPro
     """
+    def getOptionChain(self,
+                       symbol: str,
+                       contractType: ContractType = ContractType.ALL,
+                       strikeCount: int = 4,
+                       includeUnderlyingQuote: bool = False,
+                       strategy: Strategy = Strategy.SINGLE,
+                       interval: float=None,
+                       strike: float=None,
+                       range: Range=Range.ITM,
+                       fromDate: str=None,
+                       toDate: str=None,
+                       volatility: float=None,
+                       underlyingPrice: float=None,
+                       interestRate: float=None,
+                       daysToExpiration: int=0,
+                       expMonth: str=None,
+                       optionType: str=None,
+                       entitlement: str="NP") -> OptionChain:
+        
+        reqUrl = f"https://api.schwabapi.com/marketdata/v1/chains?symbol={symbol}&contractType={contractType.value}&strikeCount={strikeCount}&includeUnderlyingQuote={includeUnderlyingQuote}&strategy={strategy.value}&entitlement={entitlement}"
+
+        print(reqUrl)
+
+        if interval:
+            reqUrl += f"&interval={interval}"
+        
+        if strike:
+            reqUrl += f"&strike={strike}"
+        
+        if range:
+            reqUrl += f"&range={range}"
+
+        if fromDate:
+            reqUrl += f"&fromDate={fromDate}"
+        
+        if toDate: 
+            reqUrl += f"&toDate={toDate}"
+
+        if volatility:
+            reqUrl += f"&volatility={volatility}"
+        
+        if underlyingPrice:
+            reqUrl += f"&underlyingPrice={underlyingPrice}"
+
+        if interestRate:
+            reqUrl += f"&interestRate={interestRate}"
+
+        if daysToExpiration:
+            reqUrl += f"&daysToExpiration={daysToExpiration}"
+
+        if expMonth:
+            reqUrl += f"&expMonth={expMonth}"
+
+        if optionType:
+            reqUrl += f"&optionType={optionType}"
+        
+        res = self.schwab.sendRequest(RequestType.GET, reqUrl)
+
+        return res
+        
+
     def getPriceHistory(self, 
-                        ticker: str, 
+                        symbol: str, 
                         periodType: PeriodType, # day, month, year, ytd
                         period: int,
-                        str, startDate: str = None, endDate: str = None):
+                        frequencyType: str,
+                        frequency: int,
+                        startDate: int = None,
+                        endDate: int = None,
+                        needExtendedHoursData: bool = False,
+                        needPreviousClose: bool = False) -> CandleList:
 
         # the date passed here to the url has to be in unix milliseconds
 
@@ -77,38 +169,14 @@ class Market():
 
             todayDate = int(datetime.now().timestamp()) * 1000
 
-            reqUrl = "https://api.schwabapi.com/marketdata/v1/pricehistory?symbol=" + ticker + \
-            "&periodType=year&period=20&frequencyType=daily&endDate=" + str(todayDate) + "&needPreviousClose=true"
+            reqUrl = f"https://api.schwabapi.com/marketdata/v1/pricehistory?symbol={symbol}&periodType={periodType}&period={period}&frequencyType={frequencyType}&frequency={frequency}&endDate={todayDate}&needExtendedHoursData={needExtendedHoursData}&needPreviousClose={needPreviousClose}"
 
         else:
 
-            endDate = int(datetime.strptime(endDate, "%Y-%m-%d").timestamp()) * 1000
-            startDate = int(datetime.strptime(startDate, "%Y-%m-%d").timestamp()) * 1000
-
-            reqUrl = "https://api.schwabapi.com/marketdata/v1/pricehistory?symbol=" + ticker + \
-            "&startDate=" + str(startDate) + "&endDate=" + str(endDate) + "&periodType=year&frequencyType=daily"
+            reqUrl = f"https://api.schwabapi.com/marketdata/v1/pricehistory?symbol={symbol}&periodType={periodType}&period={period}&frequencyType={frequencyType}&frequency={frequency}&startDate={startDate}&endDate={todayDate}&needExtendedHoursData={needExtendedHoursData}&needPreviousClose={needPreviousClose}"
 
 
         res = self.schwab.sendRequest(RequestType.GET, reqUrl)
 
         return res
         
-
-    # def getOptionChain(self,
-    #                    symbol: str,
-    #                    contractType: ContractType,
-    #                    strikeCount: int,
-    #                    includeUnderlyingQuote: bool,
-    #                    strategy: Strategy,
-    #                    interval: float,
-    #                    strike: float,
-    #                    range: Range,
-    #                    fromDate: str,
-    #                    toDate: str,
-    #                    volatility: float,
-    #                    underlyingPrice: float,
-    #                    interestRate: float,
-    #                    daysToExpiration: int,
-    #                    expMonth: str,
-    #                    optionType: str,
-    #                    entitlement: str)

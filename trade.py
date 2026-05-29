@@ -7,7 +7,7 @@ from auth import Auth
 
 class Trade():
 
-    def __init__(self, auth: Auth):
+    def __init__(self):
         self.auth = Auth()
 
     def getAllOrders(self, accountNumberHash, status=None):
