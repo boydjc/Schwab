@@ -194,6 +194,8 @@ class Market():
         sort: MarketIndexSort - Sort by a particular attribute
         frequency: int - To return movers with the specified directions of up or down
     '''
+    #TODO: The offical return schema from schwab on this one is a bit weird
+    # figure out the correct way to represent in function declaration
     def getMovers(self,
                   index: MarketIndex,
                   sort: MarketIndexSort,
@@ -205,5 +207,20 @@ class Market():
             }
         
         res = self.schwab.sendRequest(RequestType.GET,  f"https://api.schwabapi.com/marketdata/v1/movers/{index.value}", {}, params)
+
+        return res
+    
+    # date params defaults to today is none is passed
+    # date format: YYYY-MM-DD
+    def getAllMarketHours(self,
+                          markets: MarketType,
+                          date: str = None):
+        
+        resUrl = f"https://api.schwabapi.com/marketdata/v1/markets?markets={markets.value}"
+
+        if date:
+            resUrl = resUrl + f"&date={date}"
+
+        res = self.schwab.sendRequest(RequestType.GET, resUrl)
 
         return res

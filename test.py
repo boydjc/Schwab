@@ -39,6 +39,9 @@ class Test():
     def getMovers(self):
         print(self.market.getMovers(MarketIndex.DJI,
                                     MarketIndexSort.PERCENT_CHANGE_UP))
+        
+    def getAllMarketHours(self):
+        print(self.market.getAllMarketHours(MarketType.EQUITY))
 
     # Account Tests
 
@@ -161,7 +164,8 @@ if __name__ == "__main__":
     #test.getQuote()
     #test.getOptionChain()
     #test.getExpirationChain()
-    test.getMovers()
+    #test.getMovers()
+    test.getAllMarketHours()
 
 
 

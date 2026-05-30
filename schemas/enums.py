@@ -638,6 +638,13 @@ class MarketIndexSort(str, Enum):
     PERCENT_CHANGE_UP = "PERCENT_CHANGE_UP"
     PERCENT_CHANGE_DOWN = "PERCENT_CHANGE_DOWN"
 
+class MarketType(str, Enum):
+    EQUITY = "EQUITY"
+    OPTION = "OPTION"
+    BOND = "BOND"
+    FUTURE = "FUTURE"
+    FOREX = "FOREX"
+
 
 
 
