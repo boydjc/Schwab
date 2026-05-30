@@ -618,6 +618,26 @@ class Entitlement(str, Enum):
     NP = "NP" # Nonpro
     PP = "PP" # paying pro
 
+# mostly used for the movers endpoint on market api
+class MarketIndex(str, Enum):
+    DJI = "$DJI"
+    COMPX = "$COMPX"
+    SPX = "$SPX"
+    NYSE = "NYSE"
+    NASDAQ = "NASDAQ"
+    OTCBB = "OTCBB"
+    INDEX_ALL = "INDEX_ALL"
+    EQUITY_ALL = "EQUITY_ALL"
+    OPTION_ALL = "OPTION_ALL"
+    OPTION_PUT = "OPTION_PUT"
+    OPTION_CALL = "OPTION_CALL"
+
+class MarketIndexSort(str, Enum):
+    VOLUME = "VOLUME"
+    TRADES = "TRADES"
+    PERCENT_CHANGE_UP = "PERCENT_CHANGE_UP"
+    PERCENT_CHANGE_DOWN = "PERCENT_CHANGE_DOWN"
+
 
 
 

@@ -188,3 +188,22 @@ class Market():
 
         return res
         
+    '''
+    Params:
+        symbol_id: MarketIndex - Index Symbol
+        sort: MarketIndexSort - Sort by a particular attribute
+        frequency: int - To return movers with the specified directions of up or down
+    '''
+    def getMovers(self,
+                  index: MarketIndex,
+                  sort: MarketIndexSort,
+                  frequency: int = 0):
+        
+        params={
+                "sort": sort.value,
+                "frequency": frequency,
+            }
+        
+        res = self.schwab.sendRequest(RequestType.GET,  f"https://api.schwabapi.com/marketdata/v1/movers/{index.value}", {}, params)
+
+        return res

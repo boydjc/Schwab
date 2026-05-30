@@ -36,6 +36,10 @@ class Test():
     def getExpirationChain(self):
         print(self.market.getExpirationChain("AAPL"))
 
+    def getMovers(self):
+        print(self.market.getMovers(MarketIndex.DJI,
+                                    MarketIndexSort.PERCENT_CHANGE_UP))
+
     # Account Tests
 
     def getUserPreferences(self):
@@ -156,7 +160,8 @@ if __name__ == "__main__":
     #test.getQuotes()
     #test.getQuote()
     #test.getOptionChain()
-    test.getExpirationChain()
+    #test.getExpirationChain()
+    test.getMovers()
 
 
 
