@@ -645,6 +645,14 @@ class MarketType(str, Enum):
     FUTURE = "FUTURE"
     FOREX = "FOREX"
 
+# used for /instrument market endpoint
+class Projection(str, Enum):
+    SYMBOL_SEARCH = "symbol-search"
+    SYMBOL_REGEX = "symbol-regex"
+    DESC_SEARCH = "desc-search"
+    DESC_REGEX = "desc-regex"
+    SEARCH = "search"
+    FUNDAMENTAL = "fundamental"
 
 
 

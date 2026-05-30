@@ -213,14 +213,49 @@ class Market():
     # date params defaults to today is none is passed
     # date format: YYYY-MM-DD
     def getAllMarketHours(self,
-                          markets: MarketType,
+                          markets: list[MarketType],
                           date: str = None):
         
-        resUrl = f"https://api.schwabapi.com/marketdata/v1/markets?markets={markets.value}"
+        reqUrl = f"https://api.schwabapi.com/marketdata/v1/markets?markets={markets[0].value}"
+
+        if len(markets) > 1:
+            
+            for market in range(1, len(markets)):
+                reqUrl = reqUrl + f"&markets={markets[market].value}"
 
         if date:
-            resUrl = resUrl + f"&date={date}"
+            reqUrl = reqUrl + f"&date={date}"
 
-        res = self.schwab.sendRequest(RequestType.GET, resUrl)
+        res = self.schwab.sendRequest(RequestType.GET, reqUrl)
+
+        return res
+    
+    # date params defaults to today is none is passed
+    # date format: YYYY-MM-DD
+    def getMarketHours(self,
+                       markets: MarketType,
+                       date: str = None):
+        
+        reqUrl = f"https://api.schwabapi.com/marketdata/v1/markets?markets={markets.value}"
+
+        if date:
+            reqUrl = reqUrl + f"&date={date}"
+
+        res = self.schwab.sendRequest(RequestType.GET, reqUrl)
+
+        return res
+    
+    def getInstruments(self, symbol: str, projection: Projection):
+
+        reqUrl = f"https://api.schwabapi.com/marketdata/v1/instruments?&symbol={symbol}&projection={projection.value}"
+
+        res = self.schwab.sendRequest(RequestType.GET, reqUrl)
+
+        return res
+    
+    def getInstrumentByCusip(self, cusip_id: str):
+        reqUrl = f"https://api.schwabapi.com/marketdata/v1/instruments/{cusip_id}"
+
+        res = self.schwab.sendRequest(RequestType.GET, reqUrl)
 
         return res

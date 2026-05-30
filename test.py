@@ -41,7 +41,13 @@ class Test():
                                     MarketIndexSort.PERCENT_CHANGE_UP))
         
     def getAllMarketHours(self):
-        print(self.market.getAllMarketHours(MarketType.EQUITY))
+        print(self.market.getAllMarketHours([MarketType.EQUITY, MarketType.BOND, MarketType.FOREX]))
+
+    def getMarketHours(self):
+        print(self.market.getMarketHours(MarketType.OPTION))
+
+    def getInstruments(self):
+        print(self.market.getInstruments("AAPL", Projection.FUNDAMENTAL))
 
     # Account Tests
 
@@ -165,7 +171,9 @@ if __name__ == "__main__":
     #test.getOptionChain()
     #test.getExpirationChain()
     #test.getMovers()
-    test.getAllMarketHours()
+    #test.getAllMarketHours()
+    #test.getMarketHours()
+    test.getInstruments()
 
 
 
